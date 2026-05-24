@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход и Регистрация | Почему Нет?</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        coffee: { 50: '#fcfaf8', 100: '#f5f0e8', 200: '#e8dbce', 300: '#d7c0ae', 400: '#c29d84', 500: '#ab7e60', 600: '#946247', 700: '#7a4e3a', 800: '#6b4e3d', 900: '#3e2a21', 950: '#1a120e' },
+                        terracotta: { DEFAULT: '#d9774f', 500: '#d9774f', 600: '#c5613a' }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-coffee-50 text-coffee-900 selection:bg-terracotta selection:text-white flex flex-col min-h-screen">
+
+    <div id="header-placeholder"></div>
+
+    <!-- Two-column layout -->
+    <main class="flex-grow flex items-stretch">
+        <!-- Left: Image -->
+        <div class="hidden lg:block lg:w-1/2 bg-cover bg-center"
+             style="background-image: url('https://images.unsplash.com/photo-1521017430531-1379c65b1613?w=1200&q=80');">
+            <div class="h-full w-full bg-coffee-950/50 flex flex-col items-center justify-center p-16 text-white text-center">
+                <i class="fas fa-coffee text-6xl text-terracotta mb-8"></i>
+                <h2 class="text-4xl font-serif font-bold mb-4">Почему Нет?</h2>
+                <p class="text-white/70 text-lg italic leading-relaxed">
+                    «Можно выпить чашку кофе.<br>Потом перевернуть мир.»
+                </p>
+            </div>
+        </div>
+
+        <!-- Right: Form -->
+        <div class="w-full lg:w-1/2 flex items-center justify-center py-24 px-6">
+            <div class="w-full max-w-md">
+
+                <!-- Tabs -->
+                <div class="flex border-b-2 border-coffee-100 mb-10">
+                    <button class="auth-tab flex-1 py-4 text-center font-bold text-coffee-900 border-b-2 border-coffee-900 -mb-[2px]" data-tab="login">Вход</button>
+                    <button class="auth-tab flex-1 py-4 text-center font-bold text-coffee-300 hover:text-coffee-600 transition-colors" data-tab="register">Регистрация</button>
+                </div>
+
+                <!-- Toast -->
+                <div id="toast-container" class="mb-4 flex flex-col gap-2"></div>
+
+                <!-- Login Form -->
+                <form id="login-form" class="space-y-6">
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-bold uppercase tracking-widest text-coffee-400">Имя пользователя</label>
+                        <div class="relative">
+                            <i class="fas fa-user absolute left-4 top-1/2 -translate-y-1/2 text-coffee-300"></i>
+                            <input id="login-username" type="text" required placeholder="your_name"
+                                   class="w-full bg-coffee-50 border border-coffee-100 rounded-2xl pl-12 pr-4 py-4 focus:ring-2 focus:ring-terracotta outline-none transition-all">
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-bold uppercase tracking-widest text-coffee-400">Пароль</label>
+                        <div class="relative">
+                            <i class="fas fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-coffee-300"></i>
+                            <input id="login-password" type="password" required placeholder="••••••••"
+                                   class="w-full bg-coffee-50 border border-coffee-100 rounded-2xl pl-12 pr-4 py-4 focus:ring-2 focus:ring-terracotta outline-none transition-all">
+                        </div>
+                    </div>
+                    <button type="submit" id="login-submit-btn"
+                            class="w-full bg-coffee-900 text-white font-bold py-5 rounded-2xl hover:bg-coffee-800 transition-all shadow-lg btn-hover flex items-center justify-center gap-3">
+                        Войти в аккаунт <i class="fas fa-arrow-right text-sm"></i>
+                    </button>
+                </form>
+
+                <!-- Register Form -->
+                <form id="register-form" class="space-y-5 hidden">
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-bold uppercase tracking-widest text-coffee-400">Имя пользователя</label>
+                        <div class="relative">
+                            <i class="fas fa-user absolute left-4 top-1/2 -translate-y-1/2 text-coffee-300"></i>
+                            <input id="reg-username" type="text" required placeholder="alexander_k"
+                                   class="w-full bg-coffee-50 border border-coffee-100 rounded-2xl pl-12 pr-4 py-4 focus:ring-2 focus:ring-terracotta outline-none transition-all">
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-bold uppercase tracking-widest text-coffee-400">Email</label>
+                        <div class="relative">
+                            <i class="fas fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-coffee-300"></i>
+                            <input id="reg-email" type="email" required placeholder="name@email.com"
+                                   class="w-full bg-coffee-50 border border-coffee-100 rounded-2xl pl-12 pr-4 py-4 focus:ring-2 focus:ring-terracotta outline-none transition-all">
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-bold uppercase tracking-widest text-coffee-400">Пароль</label>
+                        <div class="relative">
+                            <i class="fas fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-coffee-300"></i>
+                            <input id="reg-password" type="password" required placeholder="Минимум 6 символов"
+                                   class="w-full bg-coffee-50 border border-coffee-100 rounded-2xl pl-12 pr-4 py-4 focus:ring-2 focus:ring-terracotta outline-none transition-all">
+                        </div>
+                    </div>
+                    <button type="submit" id="reg-submit-btn"
+                            class="w-full bg-terracotta text-white font-bold py-5 rounded-2xl hover:bg-terracotta-600 transition-all shadow-lg btn-hover flex items-center justify-center gap-3">
+                        Создать аккаунт <i class="fas fa-arrow-right text-sm"></i>
+                    </button>
+                </form>
+
+            </div>
+        </div>
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+    <script src="js/api.js"></script>
+    <script src="js/components.js"></script>
+    <script>
+        // Auth page specific logic
+        document.addEventListener('DOMContentLoaded', () => {
+            const tabs = document.querySelectorAll('.auth-tab');
+            const loginForm = document.getElementById('login-form');
+            const regForm = document.getElementById('register-form');
+
+            // Switch tabs
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => {
+                        t.classList.remove('text-coffee-900', 'border-b-2', 'border-coffee-900', '-mb-[2px]');
+                        t.classList.add('text-coffee-300');
+                    });
+                    tab.classList.remove('text-coffee-300');
+                    tab.classList.add('text-coffee-900', 'border-b-2', 'border-coffee-900', '-mb-[2px]');
+                    const isLogin = tab.dataset.tab === 'login';
+                    loginForm.classList.toggle('hidden', !isLogin);
+                    regForm.classList.toggle('hidden', isLogin);
+                });
+            });
+
+            function showError(message) {
+                const container = document.getElementById('toast-container');
+                container.innerHTML = `
+                    <div class="bg-red-50 border border-red-200 text-red-700 px-5 py-4 rounded-2xl text-sm font-medium flex items-center gap-3">
+                        <i class="fas fa-exclamation-circle text-red-400"></i> ${message}
+                    </div>`;
+            }
+
+            function setLoading(btn, loading) {
+                btn.disabled = loading;
+                btn.innerHTML = loading
+                    ? '<i class="fas fa-circle-notch fa-spin"></i> Загрузка...'
+                    : (btn.id === 'login-submit-btn' ? 'Войти в аккаунт <i class="fas fa-arrow-right text-sm"></i>' : 'Создать аккаунт <i class="fas fa-arrow-right text-sm"></i>');
+            }
+
+            // Login
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const btn = document.getElementById('login-submit-btn');
+                setLoading(btn, true);
+                try {
+                    const user = await api.login(
+                        document.getElementById('login-username').value,
+                        document.getElementById('login-password').value
+                    );
+                    localStorage.setItem('coffee_user', JSON.stringify(user));
+                    window.location.href = 'profile.html';
+                } catch (err) {
+                    showError(err.message);
+                    setLoading(btn, false);
+                }
+            });
+
+            // Register
+            regForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const btn = document.getElementById('reg-submit-btn');
+                setLoading(btn, true);
+                try {
+                    const user = await api.register(
+                        document.getElementById('reg-username').value,
+                        document.getElementById('reg-email').value,
+                        document.getElementById('reg-password').value
+                    );
+                    localStorage.setItem('coffee_user', JSON.stringify(user));
+                    window.location.href = 'profile.html';
+                } catch (err) {
+                    showError(err.message);
+                    setLoading(btn, false);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

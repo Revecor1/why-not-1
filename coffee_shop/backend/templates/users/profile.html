@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Профиль — Почему нет?{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <div class="profile-header">
+            {% if user.avatar %}
+                <img src="{{ user.avatar.url }}" alt="Avatar" class="profile-avatar" style="object-fit: cover;">
+            {% else %}
+                <div class="profile-avatar">{{ user.username|first|upper }}</div>
+            {% endif %}
+            <div>
+                <h1>{{ user.username }}</h1>
+                <p class="text-muted">{{ user.email }}</p>
+                {% if user.phone %}<p class="text-muted">📞 {{ user.phone }}</p>{% endif %}
+            </div>
+            
+        </div>
+        
+        <div class="auth-card" style="margin: 0 0 40px 0; max-width: 100%;">
+            <h2>Редактировать профиль</h2>
+            <form method="post" enctype="multipart/form-data" style="margin-top: 20px;">
+                {% csrf_token %}
+                {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                    <span class="form-error">{{ field.errors.0 }}</span>
+                    {% endif %}
+                </div>
+                {% endfor %}
+                <button type="submit" class="btn btn-primary">Сохранить</button>
+            </form>
+        </div>
+        <h2 class="section-title">История заказов</h2>
+
+        {% if orders %}
+        <div class="orders-list">
+            {% for order in orders %}
+            <div class="order-card">
+                <div class="order-head">
+                    <span class="order-id">Заказ #{{ order.pk }}</span>
+                    <span class="order-status status-{{ order.status }}">{{ order.get_status_display }}</span>
+                </div>
+                <div class="order-body">
+                    <span>{{ order.created_at|date:"d.m.Y H:i" }}</span>
+                    <span class="accent">{{ order.total_price }} ₽</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">📦</div>
+            <h2>Заказов пока нет</h2>
+            <a href="{% url 'menu' %}" class="btn btn-primary">Сделать первый заказ</a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

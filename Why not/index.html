@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Почему Нет? | Кофейня и Кухня в Ульяновске</title>
+    
+    <meta name="description" content="Кофейня «Почему Нет?» в Ульяновске. Лучший кофе, завтраки весь день, уютная атмосфера.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        coffee: { 50: '#fcfaf8', 100: '#f5f0e8', 200: '#e8dbce', 300: '#d7c0ae', 400: '#c29d84', 500: '#ab7e60', 600: '#946247', 700: '#7a4e3a', 800: '#6b4e3d', 900: '#3e2a21', 950: '#1a120e' },
+                        terracotta: { DEFAULT: '#d9774f', 500: '#d9774f', 600: '#c5613a' }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-coffee-50 text-coffee-900 selection:bg-terracotta selection:text-white flex flex-col min-h-screen">
+
+    <div id="header-placeholder"></div>
+
+    <!-- Hero Section -->
+    <section class="hero-bg min-h-screen flex items-center justify-center relative overflow-hidden">
+        <div class="max-w-5xl mx-auto px-6 text-center z-10">
+            <div class="inline-block px-4 py-1 bg-white/10 backdrop-blur-md rounded-full border border-white/20 mb-8 text-white text-sm font-medium tracking-widest uppercase">
+                Ульяновск | ул. Карла Маркса, 18
+            </div>
+            <h1 class="text-5xl md:text-8xl font-serif text-white font-bold mb-8 leading-[1.1] drop-shadow-2xl">
+                Можно выпить чашку кофе.<br>
+                Потом перевернуть мир.<br>
+                <span class="text-terracotta italic">Почему нет?</span>
+            </h1>
+            <p class="text-lg md:text-xl text-coffee-100 mb-12 max-w-2xl mx-auto font-medium opacity-90 leading-relaxed">
+                Твоя любимая кофейня в самом сердце города. Идеальный кофе, завтраки круглый день и та самая атмосфера.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-6 justify-center items-center">
+                <a href="menu.html" class="btn-hover bg-terracotta hover:bg-terracotta-600 text-white font-bold py-5 px-12 rounded-2xl shadow-xl text-lg min-w-[220px]">
+                    Смотреть меню
+                </a>
+                <a href="menu.html#reservation" class="btn-hover bg-white/10 hover:bg-white/20 backdrop-blur-md border-2 border-white text-white font-bold py-5 px-12 rounded-2xl shadow-xl text-lg min-w-[220px]">
+                    Забронировать
+                </a>
+            </div>
+        </div>
+        <div class="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-coffee-50 to-transparent"></div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-32 bg-coffee-50">
+        <div class="max-w-7xl mx-auto px-6 lg:px-12">
+            <div class="flex flex-col md:flex-row items-end justify-between mb-16 gap-8">
+                <div class="max-w-2xl">
+                    <span class="text-terracotta font-bold uppercase tracking-[0.3em] text-xs mb-4 block">О нас</span>
+                    <h2 class="text-4xl md:text-6xl font-serif font-bold text-coffee-900 mb-6 leading-tight">Больше, чем просто кофейня</h2>
+                    <p class="text-coffee-600 text-lg leading-relaxed">
+                        Мы создали «Почему Нет?» как место силы и вдохновения. У нас можно быть продуктивным, а можно просто созерцать.
+                    </p>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+                <div class="group bg-white p-10 rounded-[3rem] shadow-sm hover:shadow-2xl transition-all duration-500 border border-coffee-100 text-center">
+                    <div class="w-20 h-20 bg-orange-50 rounded-full flex items-center justify-center mx-auto mb-8 text-terracotta group-hover:scale-110 transition-transform duration-500">
+                        <i class="fas fa-dog text-3xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold font-serif mb-4">Dog-Friendly</h3>
+                    <p class="text-coffee-600 leading-relaxed text-sm">Заходите к нам с вашими питомцами! У нас всегда есть миска с водой.</p>
+                </div>
+                <!-- ... other features ... -->
+                <div class="group bg-white p-10 rounded-[3rem] shadow-sm hover:shadow-2xl transition-all duration-500 border border-coffee-100 text-center">
+                    <div class="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-8 text-coffee-800 group-hover:scale-110 transition-transform duration-500">
+                        <i class="fas fa-mug-hot text-3xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold font-serif mb-4">Specialty Зерно</h3>
+                    <p class="text-coffee-600 leading-relaxed text-sm">Мы работаем только со свежей обжаркой и выбираем лучшее зерно.</p>
+                </div>
+                <div class="group bg-white p-10 rounded-[3rem] shadow-sm hover:shadow-2xl transition-all duration-500 border border-coffee-100 text-center">
+                    <div class="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-8 text-green-700 group-hover:scale-110 transition-transform duration-500">
+                        <i class="fas fa-leaf text-3xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold font-serif mb-4">Уют и Тишина</h3>
+                    <p class="text-coffee-600 leading-relaxed text-sm">Идеальное место для работы. Мягкий свет, тихая музыка и розетки.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Minimal -->
+    <section class="py-2 bg-white">
+        <div class="grid grid-cols-2 md:grid-cols-4">
+            <img src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=500&q=80" class="w-full h-80 object-cover grayscale-[0.5] hover:grayscale-0 transition-all duration-700" alt="Coffee">
+            <img src="https://images.unsplash.com/photo-1559925393-8be0ec4767c8?w=500&q=80" class="w-full h-80 object-cover grayscale-[0.5] hover:grayscale-0 transition-all duration-700" alt="Interior">
+            <img src="https://images.unsplash.com/photo-1497935586351-b67a49e012bf?w=500&q=80" class="w-full h-80 object-cover grayscale-[0.5] hover:grayscale-0 transition-all duration-700" alt="Coffee art">
+            <img src="https://images.unsplash.com/photo-1521017430531-1379c65b1613?w=500&q=80" class="w-full h-80 object-cover grayscale-[0.5] hover:grayscale-0 transition-all duration-700" alt="Food">
+        </div>
+    </section>
+
+    <!-- Contacts Section -->
+    <section id="contacts" class="py-32 bg-white">
+        <div class="max-w-7xl mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+            <div class="space-y-12">
+                <div>
+                    <span class="text-terracotta font-bold uppercase tracking-[0.3em] text-xs mb-4 block">Контакты</span>
+                    <h2 class="text-4xl md:text-6xl font-serif font-bold text-coffee-900">Заходите в гости</h2>
+                </div>
+                <div class="space-y-8">
+                    <div class="flex items-start gap-6">
+                        <i class="fas fa-map-marked-alt text-2xl text-terracotta"></i>
+                        <div>
+                            <h4 class="text-lg font-bold text-coffee-900">Где мы?</h4>
+                            <p class="text-coffee-600">Ульяновск, ул. Карла Маркса, 18, 1 этаж</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-6">
+                        <i class="fas fa-clock text-2xl text-terracotta"></i>
+                        <div>
+                            <h4 class="text-lg font-bold text-coffee-900">Работаем</h4>
+                            <p class="text-coffee-600">Ежедневно: 07:00 – 22:00</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="h-[450px] rounded-[3rem] overflow-hidden border-[12px] border-coffee-50">
+                <iframe src="https://yandex.ru/map-widget/v1/?um=constructor%3A3b035a1a1f0a28f8045f2e16f8ec26f5f6d6346b9a89c9339ea89254c25f46eb&amp;source=constructor" width="100%" height="100%" frameborder="0"></iframe>
+            </div>
+        </div>
+    </section>
+
+    <div id="footer-placeholder"></div>
+    <div id="chat-placeholder"></div>
+
+    <script src="js/api.js"></script>
+    <script src="js/components.js"></script>
+    <script src="js/chat.js"></script>
+</body>
+</html>

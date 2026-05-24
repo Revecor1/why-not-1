@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: sans-serif; background: #fff; padding: 20px; color: #333; }
+        .batch { display: flex; flex-wrap: wrap; gap: 40px; justify-content: center; }
+        .mockup { border: 2px solid #ccc; padding: 10px; width: 280px; background: #f9f9f9; text-align: center; }
+        .mockup h3 { margin-top: 5px; color: #666; font-size: 13px; }
+        .box { background: #ddd; border: 1px solid #bbb; margin-bottom: 8px; }
+        
+        /* Стили для разных схем */
+        .header { height: 25px; width: 100%; margin-bottom: 10px; }
+        .hero { height: 100px; width: 100%; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .item { height: 50px; }
+        .sidebar { height: 120px; width: 30%; }
+        .main-content { height: 120px; width: 65%; }
+        .flex { display: flex; gap: 10px; }
+        .input { height: 20px; width: 80%; margin: 5px auto; }
+        .button { height: 25px; width: 50%; margin: 10px auto; background: #bbb; }
+        .chat-bubble { height: 35px; width: 70%; border-radius: 5px; margin-bottom: 5px; }
+        .left { align-self: flex-start; background: #ddd;}
+        .right { align-self: flex-end; background: #eee; border: 1px dashed #999; margin-left: 30%;}
+    </style>
+</head>
+<body>
+    <h2 style="text-align:center">Все макеты РАЗДЕЛЬНО (Рисунки 2–12) 🏗️</h2>
+    <div class="batch">
+        <div class="mockup"><h3>Рисунок 2: Главная</h3>
+            <div class="box header"></div><div class="box hero"></div><div class="grid"><div class="box item"></div><div class="box item"></div></div>
+        </div>
+        <div class="mockup"><h3>Рисунок 3: Столики</h3>
+            <div class="box header"></div><div class="grid"><div class="box item"></div><div class="box item"></div><div class="box item"></div><div class="box item"></div></div>
+        </div>
+        <div class="mockup"><h3>Рисунок 4: Меню</h3>
+            <div class="box header"></div><div class="box" style="height:150px"></div>
+        </div>
+        <div class="mockup"><h3>Рисунок 5: Акции</h3>
+            <div class="box header"></div><div class="grid"><div class="box item" style="height:80px"></div><div class="box item" style="height:80px"></div></div>
+        </div>
+        <div class="mockup"><h3>Рисунок 6: Вход</h3>
+            <div class="box header"></div><div class="box input" style="width:70%"></div><div class="box input" style="width:70%"></div><div class="box button"></div>
+        </div>
+        <div class="mockup"><h3>Рисунок 7: Регистрация</h3>
+            <div class="box header"></div><div class="box input"></div><div class="box input"></div><div class="box input"></div><div class="box button"></div>
+        </div>
+        <div class="mockup"><h3>Рисунок 8: Профиль</h3>
+            <div class="flex"><div class="box sidebar"></div><div class="box main-content"></div></div>
+        </div>
+        <div class="mockup"><h3>Рисунок 9: FAQ</h3>
+            <div class="box header"></div><div class="box" style="height:15px; width:90%"></div><div class="box" style="height:15px; width:90%"></div><div class="box" style="height:15px; width:90%"></div>
+        </div>
+        <div class="mockup"><h3>Рисунок 10: Форма связи</h3>
+            <div class="box header"></div><div class="box input"></div><div class="box" style="height:60px; width:80%; margin:auto; background:#eee"></div><div class="box button"></div>
+        </div>
+        <div class="mockup"><h3>Рисунок 11: Чат (Пользователь)</h3>
+            <div class="box chat-bubble left" style="width:60%"></div><div class="box chat-bubble right" style="width:60%"></div><div class="box header"></div>
+        </div>
+        <div class="mockup"><h3>Рисунок 12: Панель (Админ)</h3>
+            <div class="box header"></div><div class="box" style="height:15px; margin:3px; background:#ccc"></div><div class="box" style="height:15px; margin:3px"></div><div class="box" style="height:15px; margin:3px"></div>
+        </div>
+    </div>
+</body>
+</html>

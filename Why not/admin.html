@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админ-панель | Почему Нет?</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        coffee: { 50: '#fcfaf8', 100: '#f5f0e8', 200: '#e8dbce', 300: '#d7c0ae', 400: '#c29d84', 500: '#ab7e60', 600: '#946247', 700: '#7a4e3a', 800: '#6b4e3d', 900: '#3e2a21', 950: '#1a120e' },
+                        terracotta: { DEFAULT: '#d9774f', 500: '#d9774f', 600: '#c5613a' }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-gray-100 text-gray-900 flex flex-col min-h-screen font-sans">
+
+    <!-- Admin Login Overlay -->
+    <div id="admin-login-overlay" class="fixed inset-0 bg-coffee-950 z-[10000] flex items-center justify-center p-6 transition-all duration-500">
+        <div class="bg-white w-full max-w-md rounded-[2rem] p-10 shadow-2xl">
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-coffee-800 text-white rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-lock text-3xl"></i>
+                </div>
+                <h1 class="text-2xl font-serif font-bold">Вход в админ-панель</h1>
+                <p class="text-gray-400 text-sm">Введите пароль администратора</p>
+            </div>
+            <form id="admin-login-form" class="space-y-4">
+                <input type="password" id="admin-pass" required placeholder="Пароль" class="w-full bg-gray-100 border-none rounded-xl p-4 text-center focus:ring-2 focus:ring-coffee-800 outline-none">
+                <button type="submit" class="w-full bg-coffee-900 text-white font-bold py-4 rounded-xl hover:bg-coffee-800 transition-all">Войти</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="admin-dashboard" class="hidden flex-grow flex flex-col">
+        <!-- Sidebar & Content -->
+        <div class="flex flex-col lg:flex-row flex-grow">
+            <!-- Sidebar -->
+            <aside class="lg:w-64 bg-coffee-900 text-white p-6 space-y-8">
+                <div class="flex items-center gap-3 px-2 mb-10">
+                    <i class="fas fa-user-shield text-2xl text-terracotta"></i>
+                    <span class="font-serif font-bold text-xl">Admin Panel</span>
+                </div>
+                <nav class="space-y-2">
+                    <button class="admin-nav-btn active w-full flex items-center gap-4 px-4 py-3 rounded-xl bg-white/10 text-white font-bold transition-all" data-target="orders">
+                        <i class="fas fa-shopping-bag w-5"></i> Заказы
+                    </button>
+                    <button class="admin-nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl text-white/60 hover:bg-white/5 transition-all" data-target="reservations">
+                        <i class="fas fa-calendar-check w-5"></i> Брони
+                    </button>
+                    <button class="admin-nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl text-white/60 hover:bg-white/5 transition-all" data-target="chats">
+                        <i class="fas fa-comments w-5"></i> Чаты
+                        <span id="admin-chat-badge" class="ml-auto bg-terracotta text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full hidden">0</span>
+                    </button>
+                </nav>
+                <div class="pt-20">
+                    <button id="admin-logout" class="w-full flex items-center gap-4 px-4 py-3 rounded-xl text-red-400 hover:bg-red-500/10 transition-all">
+                        <i class="fas fa-sign-out-alt w-5"></i> Выйти
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="flex-grow p-6 lg:p-12 overflow-y-auto bg-gray-50">
+                <div id="admin-content-orders" class="admin-section space-y-6">
+                    <h2 class="text-3xl font-serif font-bold mb-8">Управление заказами</h2>
+                    <div id="admin-orders-list" class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                        <!-- JS -->
+                    </div>
+                </div>
+
+                <div id="admin-content-reservations" class="admin-section hidden space-y-6">
+                    <h2 class="text-3xl font-serif font-bold mb-8">Список бронирований</h2>
+                    <div class="bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden">
+                        <table class="w-full text-left">
+                            <thead class="bg-gray-100 text-gray-400 text-xs uppercase tracking-widest font-bold">
+                                <tr>
+                                    <th class="px-6 py-4">Дата/Время</th>
+                                    <th class="px-6 py-4">Гость</th>
+                                    <th class="px-6 py-4">Кол-во</th>
+                                    <th class="px-6 py-4">Телефон</th>
+                                    <th class="px-6 py-4 text-right">Действие</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-reservations-table" class="divide-y divide-gray-100">
+                                <!-- JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="admin-content-chats" class="admin-section hidden space-y-6 h-full">
+                    <h2 class="text-3xl font-serif font-bold mb-8">Поддержка (Чаты)</h2>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[600px]">
+                        <!-- Chat List -->
+                        <div class="lg:col-span-1 bg-white rounded-3xl shadow-sm border border-gray-200 overflow-y-auto">
+                            <div id="admin-chat-list" class="divide-y divide-gray-100">
+                                <!-- JS -->
+                            </div>
+                        </div>
+                        <!-- Active Chat -->
+                        <div class="lg:col-span-2 bg-white rounded-3xl shadow-sm border border-gray-200 flex flex-col overflow-hidden">
+                            <div id="admin-chat-header" class="p-6 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
+                                <h4 class="font-bold text-gray-900">Выберите чат для ответа</h4>
+                            </div>
+                            <div id="admin-chat-messages" class="flex-grow p-6 overflow-y-auto space-y-4">
+                                <!-- JS -->
+                            </div>
+                            <form id="admin-chat-form" class="p-6 border-t border-gray-100 flex gap-3 hidden">
+                                <input type="text" id="admin-chat-input" placeholder="Введите ответ..." class="flex-grow bg-gray-100 border-none rounded-2xl px-6 py-4 outline-none focus:ring-2 focus:ring-coffee-800">
+                                <button type="submit" class="bg-coffee-900 text-white px-8 rounded-2xl font-bold hover:bg-coffee-800 transition-all">Отправить</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <div id="toast-container" class="fixed bottom-6 right-6 flex flex-col gap-3 z-[10000]"></div>
+
+    <script src="js/admin.js"></script>
+</body>
+</html>

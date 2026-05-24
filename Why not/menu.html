@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Меню и Бронирование | Почему Нет?</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        coffee: { 50: '#fcfaf8', 100: '#f5f0e8', 200: '#e8dbce', 300: '#d7c0ae', 400: '#c29d84', 500: '#ab7e60', 600: '#946247', 700: '#7a4e3a', 800: '#6b4e3d', 900: '#3e2a21', 950: '#1a120e' },
+                        terracotta: { DEFAULT: '#d9774f', 500: '#d9774f', 600: '#c5613a' }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-coffee-50 text-coffee-900 selection:bg-terracotta selection:text-white flex flex-col min-h-screen">
+
+    <div id="header-placeholder"></div>
+
+    <!-- Page Header -->
+    <header class="pt-40 pb-20 bg-coffee-100 flex items-center justify-center text-center px-6">
+        <div>
+            <h1 class="text-5xl md:text-7xl font-serif font-bold text-coffee-900 mb-4">Меню и Бронь</h1>
+            <p class="text-coffee-500 max-w-xl mx-auto">Выбирайте любимые блюда и планируйте свой идеальный отдых у нас.</p>
+        </div>
+    </header>
+
+    <!-- Menu Section -->
+    <section id="menu" class="py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-6 lg:px-12">
+            <!-- Categories -->
+            <div class="flex flex-wrap justify-center gap-4 mb-20">
+                <button class="category-btn active px-8 py-3 rounded-full font-bold text-sm tracking-widest uppercase border-2 border-coffee-100" data-category="all">Всё меню</button>
+                <button class="category-btn px-8 py-3 rounded-full font-bold text-sm tracking-widest uppercase border-2 border-coffee-100" data-category="coffee">Кофе</button>
+                <button class="category-btn px-8 py-3 rounded-full font-bold text-sm tracking-widest uppercase border-2 border-coffee-100" data-category="drinks">Авторские</button>
+                <button class="category-btn px-8 py-3 rounded-full font-bold text-sm tracking-widest uppercase border-2 border-coffee-100" data-category="breakfasts">Завтраки</button>
+                <button class="category-btn px-8 py-3 rounded-full font-bold text-sm tracking-widest uppercase border-2 border-coffee-100" data-category="food">Еда</button>
+                <button class="category-btn px-8 py-3 rounded-full font-bold text-sm tracking-widest uppercase border-2 border-coffee-100" data-category="desserts">Десерты</button>
+            </div>
+
+            <!-- Grid -->
+            <div id="menu-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                <!-- JS Inject -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Reservation Section -->
+    <section id="reservation" class="py-32 bg-coffee-50 overflow-hidden relative">
+        <div class="max-w-6xl mx-auto px-6 relative z-10">
+            <div class="bg-white rounded-[4rem] shadow-2xl overflow-hidden flex flex-col lg:flex-row min-h-[700px]">
+                <div class="lg:w-7/12 p-10 md:p-20">
+                    <h2 class="text-4xl md:text-5xl font-serif font-bold text-coffee-900 mb-8">Бронирование</h2>
+                    <p class="text-coffee-600 mb-12">Запланируйте свой визит заранее.</p>
+                    
+                    <form id="reservation-form" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <label class="text-xs font-bold uppercase tracking-wider text-coffee-400 ml-1">Дата</label>
+                            <input type="date" id="res-date" required class="w-full bg-coffee-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-terracotta transition-all outline-none">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-xs font-bold uppercase tracking-wider text-coffee-400 ml-1">Время</label>
+                            <select id="res-time" required class="w-full bg-coffee-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-terracotta transition-all outline-none">
+                                <option value="" disabled selected>Выберите</option>
+                                <option value="08:00">08:00</option>
+                                <option value="12:00">12:00</option>
+                                <option value="14:00">14:00</option>
+                                <option value="18:00">18:00</option>
+                                <option value="20:30">20:30</option>
+                            </select>
+                        </div>
+                        <div class="md:col-span-2 space-y-2">
+                            <label class="text-xs font-bold uppercase tracking-wider text-coffee-400 ml-1">Ваше имя</label>
+                            <input type="text" placeholder="Имя" required class="w-full bg-coffee-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-terracotta transition-all outline-none">
+                        </div>
+                        <div class="md:col-span-2 space-y-2">
+                            <label class="text-xs font-bold uppercase tracking-wider text-coffee-400 ml-1">Телефон</label>
+                            <input type="tel" placeholder="+7" required class="w-full bg-coffee-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-terracotta transition-all outline-none">
+                        </div>
+                        <div class="md:col-span-2 pt-4">
+                            <button type="submit" class="w-full bg-coffee-900 text-white font-bold py-5 rounded-2xl hover:bg-coffee-800 transition-all shadow-xl btn-hover">Забронировать стол</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="hidden lg:block lg:w-5/12 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1525610553991-2bede1a236e2?w=1000&q=80');">
+                    <div class="h-full w-full bg-coffee-900/40 p-12 flex flex-col justify-end">
+                        <div class="bg-white/10 backdrop-blur-md p-8 rounded-3xl border border-white/20 text-white">
+                            <h4 class="text-2xl font-serif font-bold mb-2">Наш адрес</h4>
+                            <p class="text-white/80 text-sm italic">г. Ульяновск, ул. Карла Маркса, 18, 1 этаж</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modals (Cart) -->
+    <div id="cart-overlay" class="fixed inset-0 bg-coffee-900/60 backdrop-blur-sm z-[1000] modal-overlay">
+        <div id="cart-modal" class="absolute right-0 top-0 h-screen w-full max-w-md bg-white shadow-2xl slide-over flex flex-col">
+            <div class="p-8 border-b border-coffee-100 flex justify-between items-center bg-coffee-50/50">
+                <h3 class="text-3xl font-serif font-bold text-coffee-900">Твой заказ</h3>
+                <button id="close-cart" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-coffee-100 transition-all"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <div id="cart-items" class="p-8 flex-grow overflow-y-auto"></div>
+            <div class="p-8 border-t border-coffee-100 bg-coffee-50/80 backdrop-blur-md">
+                <div class="flex justify-between items-end mb-8">
+                    <span class="text-coffee-400 font-bold uppercase tracking-widest text-xs">Всего к оплате:</span>
+                    <span id="cart-total" class="text-4xl font-serif font-bold text-terracotta">0 ₽</span>
+                </div>
+                <div class="mb-6 space-y-2">
+                    <label class="text-[10px] font-bold uppercase tracking-widest text-coffee-400 ml-1">Способ получения</label>
+                    <select id="order-type" class="w-full bg-white border border-coffee-100 rounded-xl p-4 outline-none">
+                        <option value="here">В заведении</option>
+                        <option value="togo">С собой</option>
+                    </select>
+                </div>
+                <button id="checkout-btn" class="w-full bg-coffee-900 text-white font-bold py-5 rounded-2xl hover:bg-coffee-800 transition-all shadow-xl flex items-center justify-center gap-3">Оформить заказ <i class="fas fa-arrow-right text-xs"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast-container" class="fixed bottom-6 right-6 flex flex-col gap-3 z-[10000]"></div>
+
+    <div id="footer-placeholder"></div>
+    <div id="chat-placeholder"></div>
+
+    <script src="js/api.js"></script>
+    <script src="js/components.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/chat.js"></script>
+</body>
+</html>

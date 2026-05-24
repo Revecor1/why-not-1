@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}Корзина — Почему нет?{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <h1 class="section-title">Корзина</h1>
+
+        {% if items %}
+        <div class="cart-table-wrap">
+            <table class="cart-table">
+                <thead>
+                    <tr>
+                        <th>Товар</th>
+                        <th>Цена</th>
+                        <th>Кол-во</th>
+                        <th>Сумма</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                    <tr>
+                        <td>{{ item.name }}</td>
+                        <td>{{ item.price }} ₽</td>
+                        <td>{{ item.qty }}</td>
+                        <td class="accent">{{ item.subtotal }} ₽</td>
+                        <td><a href="{% url 'remove_from_cart' item.id %}" class="btn-remove">✕</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="cart-footer">
+            <div class="cart-total">Итого: <span class="accent">{{ total }} ₽</span></div>
+            <a href="{% url 'checkout' %}" class="btn btn-primary btn-lg">Оформить заказ</a>
+        </div>
+
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">🛒</div>
+            <h2>Корзина пуста</h2>
+            <p>Добавьте что-нибудь вкусное из нашего меню!</p>
+            <a href="{% url 'menu' %}" class="btn btn-primary">Перейти в меню</a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

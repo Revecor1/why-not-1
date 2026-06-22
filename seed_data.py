@@ -40,7 +40,7 @@ for cat in categories:
     if created:
         print(f"  ✅ Категория: {cat['name']}")
 
-# ---- Меню (27 позиций) ----
+# ---- Меню (28 позиций) ----
 menu_items = [
     # --- Кофе ---
     {'category': 'coffee', 'name': 'Капучино',        'description': 'Классический эспрессо с нежной молочной пенкой. Идеальный баланс.',             'price': 250, 'image': 'https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=500&q=80'},

@@ -82,6 +82,7 @@ python manage.py runserver 127.0.0.1:8000
 | POST | `/auth/register/` | Регистрация |
 | POST | `/auth/logout/` | Выход |
 | GET | `/auth/me/` | Текущий пользователь |
+| GET | `/csrf/` | CSRF-токен для POST-запросов |
 
 ## Структура проекта
 

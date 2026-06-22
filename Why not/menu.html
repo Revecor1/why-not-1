@@ -60,29 +60,33 @@
                     <h2 class="text-4xl md:text-5xl font-serif font-bold text-coffee-900 mb-8">Бронирование</h2>
                     <p class="text-coffee-600 mb-12">Запланируйте свой визит заранее.</p>
                     
-                    <form id="reservation-form" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <form id="reservation-form" action="#" method="post" class="grid grid-cols-1 md:grid-cols-2 gap-6" novalidate>
                         <div class="space-y-2">
                             <label class="text-xs font-bold uppercase tracking-wider text-coffee-400 ml-1">Дата</label>
                             <input type="date" id="res-date" required class="w-full bg-coffee-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-terracotta transition-all outline-none">
                         </div>
                         <div class="space-y-2">
                             <label class="text-xs font-bold uppercase tracking-wider text-coffee-400 ml-1">Время</label>
-                            <select id="res-time" required class="w-full bg-coffee-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-terracotta transition-all outline-none">
-                                <option value="" disabled selected>Выберите</option>
-                                <option value="08:00">08:00</option>
-                                <option value="12:00">12:00</option>
-                                <option value="14:00">14:00</option>
-                                <option value="18:00">18:00</option>
-                                <option value="20:30">20:30</option>
-                            </select>
+                            <input type="time" id="res-time" min="07:00" max="22:00" step="900" required class="w-full bg-coffee-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-terracotta transition-all outline-none">
+                            <p class="text-[10px] text-coffee-400 ml-1">С 07:00 до 22:00, шаг 15 минут</p>
                         </div>
-                        <div class="md:col-span-2 space-y-2">
+                        <div class="space-y-2">
+                            <label class="text-xs font-bold uppercase tracking-wider text-coffee-400 ml-1">Гостей</label>
+                            <input type="number" id="res-guests" min="1" max="6" value="2" required class="w-full bg-coffee-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-terracotta transition-all outline-none">
+                            <p class="text-[10px] text-coffee-400 ml-1">Не более 6 человек</p>
+                        </div>
+                        <div class="space-y-2">
                             <label class="text-xs font-bold uppercase tracking-wider text-coffee-400 ml-1">Ваше имя</label>
-                            <input type="text" placeholder="Имя" required class="w-full bg-coffee-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-terracotta transition-all outline-none">
+                            <input type="text" id="res-name" placeholder="Имя" required class="w-full bg-coffee-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-terracotta transition-all outline-none">
                         </div>
                         <div class="md:col-span-2 space-y-2">
                             <label class="text-xs font-bold uppercase tracking-wider text-coffee-400 ml-1">Телефон</label>
-                            <input type="tel" placeholder="+7" required class="w-full bg-coffee-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-terracotta transition-all outline-none">
+                            <input type="tel" id="res-phone" placeholder="+79001234567 или 89001234567" required class="w-full bg-coffee-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-terracotta transition-all outline-none">
+                            <p class="text-[10px] text-coffee-400 ml-1">Формат: +7 или 8, затем 10 цифр</p>
+                        </div>
+                        <div class="md:col-span-2 space-y-2">
+                            <label class="text-xs font-bold uppercase tracking-wider text-coffee-400 ml-1">Комментарий</label>
+                            <textarea id="res-comment" rows="2" placeholder="Пожелания к столику (необязательно)" class="w-full bg-coffee-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-terracotta transition-all outline-none resize-none"></textarea>
                         </div>
                         <div class="md:col-span-2 pt-4">
                             <button type="submit" class="w-full bg-coffee-900 text-white font-bold py-5 rounded-2xl hover:bg-coffee-800 transition-all shadow-xl btn-hover">Забронировать стол</button>
@@ -93,7 +97,7 @@
                     <div class="h-full w-full bg-coffee-900/40 p-12 flex flex-col justify-end">
                         <div class="bg-white/10 backdrop-blur-md p-8 rounded-3xl border border-white/20 text-white">
                             <h4 class="text-2xl font-serif font-bold mb-2">Наш адрес</h4>
-                            <p class="text-white/80 text-sm italic">г. Ульяновск, ул. Карла Маркса, 18, 1 этаж</p>
+                            <a href="https://yandex.ru/maps/195/ulyanovsk/house/ulitsa_karla_marksa_18/YEEYdQ5iSkcCQFtufX9zcX9hZQ==/" target="_blank" rel="noopener noreferrer" class="text-white/80 text-sm italic hover:text-white transition-colors">г. Ульяновск, ул. Карла Маркса, 18, 1 этаж</a>
                         </div>
                     </div>
                 </div>
@@ -101,30 +105,7 @@
         </div>
     </section>
 
-    <!-- Modals (Cart) -->
-    <div id="cart-overlay" class="fixed inset-0 bg-coffee-900/60 backdrop-blur-sm z-[1000] modal-overlay">
-        <div id="cart-modal" class="absolute right-0 top-0 h-screen w-full max-w-md bg-white shadow-2xl slide-over flex flex-col">
-            <div class="p-8 border-b border-coffee-100 flex justify-between items-center bg-coffee-50/50">
-                <h3 class="text-3xl font-serif font-bold text-coffee-900">Твой заказ</h3>
-                <button id="close-cart" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-coffee-100 transition-all"><i class="fas fa-times text-xl"></i></button>
-            </div>
-            <div id="cart-items" class="p-8 flex-grow overflow-y-auto"></div>
-            <div class="p-8 border-t border-coffee-100 bg-coffee-50/80 backdrop-blur-md">
-                <div class="flex justify-between items-end mb-8">
-                    <span class="text-coffee-400 font-bold uppercase tracking-widest text-xs">Всего к оплате:</span>
-                    <span id="cart-total" class="text-4xl font-serif font-bold text-terracotta">0 ₽</span>
-                </div>
-                <div class="mb-6 space-y-2">
-                    <label class="text-[10px] font-bold uppercase tracking-widest text-coffee-400 ml-1">Способ получения</label>
-                    <select id="order-type" class="w-full bg-white border border-coffee-100 rounded-xl p-4 outline-none">
-                        <option value="here">В заведении</option>
-                        <option value="togo">С собой</option>
-                    </select>
-                </div>
-                <button id="checkout-btn" class="w-full bg-coffee-900 text-white font-bold py-5 rounded-2xl hover:bg-coffee-800 transition-all shadow-xl flex items-center justify-center gap-3">Оформить заказ <i class="fas fa-arrow-right text-xs"></i></button>
-            </div>
-        </div>
-    </div>
+    <div id="cart-placeholder"></div>
 
     <!-- Toast -->
     <div id="toast-container" class="fixed bottom-6 right-6 flex flex-col gap-3 z-[10000]"></div>

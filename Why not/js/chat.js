@@ -1,7 +1,9 @@
 /**
  * js/chat.js — виджет поддержки для клиентских страниц.
  */
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    await api.ready;
+
     const chatToggle = document.getElementById('chat-toggle');
     if (!chatToggle) return;
 
@@ -44,15 +46,17 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Оптимистично добавляем сообщение
-        appendMessage({ sender: 'user', text, timestamp: new Date().toISOString() });
         chatInput.value = '';
 
         try {
             await api.sendMessage(text);
+            await loadMessages();
         } catch (err) {
-            if (err.message.includes('403') || err.message.includes('401')) {
+            if (api.isAuthError(err)) {
+                localStorage.removeItem('coffee_user');
                 showAuthPrompt();
+            } else {
+                appendSystemMsg('Не удалось отправить сообщение. Попробуйте ещё раз.');
             }
         }
     });
@@ -75,8 +79,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderMessages(messages) {
         chatMessages.innerHTML = '';
-        // Приветственное сообщение
-        appendSystemMsg('Привет! Чем можем помочь? Отвечаем с 08:00 до 22:00.');
+        if (messages.length === 0) {
+            appendSystemMsg('Привет! Чем можем помочь? Отвечаем с 08:00 до 22:00.');
+        }
         messages.forEach(msg => appendMessage(msg));
     }
 
@@ -84,15 +89,23 @@ document.addEventListener('DOMContentLoaded', () => {
         const isUser = msg.sender === 'user';
         const div = document.createElement('div');
         div.className = `flex ${isUser ? 'justify-end' : 'justify-start'}`;
-        div.innerHTML = `
-            <div class="max-w-[80%] ${isUser
-                ? 'bg-terracotta text-white rounded-2xl rounded-br-sm'
-                : 'bg-white border border-coffee-100 text-coffee-900 rounded-2xl rounded-bl-sm shadow-sm'
-            } px-4 py-2.5 text-sm">
-                <p>${msg.text}</p>
-                <p class="text-[9px] opacity-50 mt-1 text-right">${new Date(msg.timestamp).toLocaleTimeString('ru-RU', {hour: '2-digit', minute: '2-digit'})}</p>
-            </div>
-        `;
+
+        const bubble = document.createElement('div');
+        bubble.className = `max-w-[80%] ${isUser
+            ? 'bg-terracotta text-white rounded-2xl rounded-br-sm'
+            : 'bg-white border border-coffee-100 text-coffee-900 rounded-2xl rounded-bl-sm shadow-sm'
+        } px-4 py-2.5 text-sm`;
+
+        const textEl = document.createElement('p');
+        textEl.textContent = msg.text;
+        bubble.appendChild(textEl);
+
+        const timeEl = document.createElement('p');
+        timeEl.className = 'text-[9px] opacity-50 mt-1 text-right';
+        timeEl.textContent = new Date(msg.timestamp).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+        bubble.appendChild(timeEl);
+
+        div.appendChild(bubble);
         chatMessages.appendChild(div);
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }
@@ -100,11 +113,16 @@ document.addEventListener('DOMContentLoaded', () => {
     function appendSystemMsg(text) {
         const div = document.createElement('div');
         div.className = 'flex justify-start';
-        div.innerHTML = `
-            <div class="max-w-[85%] bg-white border border-coffee-100 rounded-2xl rounded-bl-sm shadow-sm px-4 py-2.5 text-sm text-coffee-700">
-                <p>${text}</p>
-            </div>
-        `;
+        const bubble = document.createElement('div');
+        bubble.className = 'max-w-[85%] bg-white border border-coffee-100 rounded-2xl rounded-bl-sm shadow-sm px-4 py-2.5 text-sm text-coffee-700';
+        const p = document.createElement('p');
+        if (text.includes('<a ')) {
+            p.innerHTML = text;
+        } else {
+            p.textContent = text;
+        }
+        bubble.appendChild(p);
+        div.appendChild(bubble);
         chatMessages.appendChild(div);
     }
 
@@ -125,10 +143,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!user) return;
             try {
                 const messages = await api.getMyChat();
-                if (messages.length > lastMessageCount) {
-                    // Есть новые сообщения
-                    const newMsgs = messages.slice(lastMessageCount);
-                    newMsgs.forEach(m => appendMessage(m));
+                if (messages.length !== lastMessageCount) {
+                    renderMessages(messages);
                     lastMessageCount = messages.length;
 
                     // Если окно закрыто — показываем бейдж

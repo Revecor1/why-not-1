@@ -90,6 +90,13 @@ h1, h2, h3, h4, .font-serif {
     box-shadow: 0 20px 40px rgba(62, 42, 33, 0.1);
 }
 
+.news-card {
+    transition: var(--transition);
+}
+.news-card:hover {
+    transform: translateY(-6px);
+}
+
 .btn-hover {
     transition: var(--transition);
 }

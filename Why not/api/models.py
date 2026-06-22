@@ -57,3 +57,33 @@ class ChatMessage(models.Model):
 
     class Meta:
         ordering = ['timestamp']
+
+
+class News(models.Model):
+    BADGE_STYLES = (
+        ('terracotta', 'Оранжевый'),
+        ('dark', 'Тёмный'),
+        ('green', 'Зелёный'),
+    )
+
+    title = models.CharField(max_length=200)
+    period = models.CharField(max_length=100, help_text='Например: Каждую пятницу')
+    body = models.TextField()
+    image = models.URLField()
+    badge = models.CharField(max_length=50, default='Акция')
+    badge_style = models.CharField(max_length=20, choices=BADGE_STYLES, default='terracotta')
+    tags = models.JSONField(default=list, blank=True)
+    footer_note = models.CharField(max_length=200, blank=True)
+    link_url = models.CharField(max_length=200, blank=True)
+    link_text = models.CharField(max_length=100, blank=True)
+    is_published = models.BooleanField(default=True)
+    sort_order = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-sort_order', '-created_at']
+        verbose_name = 'Новость'
+        verbose_name_plural = 'Новости'
+
+    def __str__(self):
+        return self.title

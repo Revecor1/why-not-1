@@ -1,13 +1,15 @@
 from rest_framework import viewsets, permissions, status, views
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework.exceptions import ValidationError
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.middleware.csrf import get_token
-from .models import Category, MenuItem, Order, OrderItem, Reservation, ChatMessage
+from django.db import transaction
+from .models import Category, MenuItem, Order, OrderItem, Reservation, ChatMessage, News
 from .serializers import (
     UserSerializer, MenuItemSerializer, OrderSerializer,
-    ReservationSerializer, ChatMessageSerializer
+    ReservationSerializer, ChatMessageSerializer, NewsSerializer
 )
 
 
@@ -64,15 +66,20 @@ class AuthView(views.APIView):
 
 class MenuViewSet(viewsets.ReadOnlyModelViewSet):
     """Только чтение — меню доступно всем."""
-    queryset = MenuItem.objects.select_related('category').all()
+    queryset = MenuItem.objects.select_related('category').order_by('category__slug', 'name')
     serializer_class = MenuItemSerializer
     permission_classes = [permissions.AllowAny]
+
+
+MAX_ITEM_QUANTITY = 10
+VALID_ORDER_TYPES = {choice[0] for choice in Order.ORDER_TYPES}
 
 
 class OrderViewSet(viewsets.ModelViewSet):
     """Заказы — только для авторизованных. Администратор видит все."""
     serializer_class = OrderSerializer
     permission_classes = [permissions.IsAuthenticated]
+    http_method_names = ['get', 'post', 'head', 'options']
 
     def get_queryset(self):
         if self.request.user.is_staff:
@@ -81,20 +88,47 @@ class OrderViewSet(viewsets.ModelViewSet):
 
     def create(self, request):
         items_data = request.data.get('items', [])
-        total = request.data.get('total', 0)
         order_type = request.data.get('order_type', 'here')
 
         if not items_data:
             return Response({'error': 'Корзина пуста'}, status=status.HTTP_400_BAD_REQUEST)
 
-        order = Order.objects.create(user=request.user, total=total, order_type=order_type)
-        for item in items_data:
-            try:
-                menu_item = MenuItem.objects.get(id=item['id'])
-                OrderItem.objects.create(order=order, menu_item=menu_item, quantity=item['quantity'])
-            except MenuItem.DoesNotExist:
-                pass
+        if order_type not in VALID_ORDER_TYPES:
+            return Response({'error': 'Некорректный способ получения'}, status=status.HTTP_400_BAD_REQUEST)
 
+        order_items = []
+        for item in items_data:
+            quantity = item.get('quantity', 0)
+            try:
+                quantity = int(quantity)
+            except (TypeError, ValueError):
+                return Response({'error': 'Некорректное количество товара'}, status=status.HTTP_400_BAD_REQUEST)
+
+            if quantity < 1:
+                return Response({'error': 'Количество товара должно быть больше 0'}, status=status.HTTP_400_BAD_REQUEST)
+
+            item_id = item.get('id')
+            try:
+                menu_item = MenuItem.objects.get(id=item_id)
+            except (MenuItem.DoesNotExist, TypeError, ValueError):
+                return Response({'error': f'Товар с id {item_id} не найден'}, status=status.HTTP_400_BAD_REQUEST)
+
+            if quantity > MAX_ITEM_QUANTITY:
+                return Response(
+                    {'error': f'Нельзя заказать больше {MAX_ITEM_QUANTITY} шт. «{menu_item.name}»'},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            order_items.append((menu_item, quantity))
+
+        total = sum(menu_item.price * quantity for menu_item, quantity in order_items)
+
+        with transaction.atomic():
+            order = Order.objects.create(user=request.user, total=total, order_type=order_type)
+            for menu_item, quantity in order_items:
+                OrderItem.objects.create(order=order, menu_item=menu_item, quantity=quantity)
+
+        order = Order.objects.prefetch_related('items__menu_item').get(pk=order.pk)
         return Response(OrderSerializer(order).data, status=status.HTTP_201_CREATED)
 
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAdminUser])
@@ -110,6 +144,7 @@ class ReservationViewSet(viewsets.ModelViewSet):
     """Бронирования — только для авторизованных."""
     serializer_class = ReservationSerializer
     permission_classes = [permissions.IsAuthenticated]
+    http_method_names = ['get', 'post', 'delete', 'head', 'options']
 
     def get_queryset(self):
         if self.request.user.is_staff:
@@ -124,10 +159,10 @@ class ChatViewSet(viewsets.ModelViewSet):
     """Сообщения чата. Пользователь видит только свои, админ — все."""
     serializer_class = ChatMessageSerializer
     permission_classes = [permissions.IsAuthenticated]
+    http_method_names = ['get', 'post', 'head', 'options']
 
     def get_queryset(self):
         if self.request.user.is_staff:
-            # Администратор может фильтровать по email пользователя
             email = self.request.query_params.get('email')
             if email:
                 return ChatMessage.objects.filter(user__email=email).select_related('user')
@@ -136,12 +171,29 @@ class ChatViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         if self.request.user.is_staff:
-            # Администратор отвечает от имени конкретного пользователя-чата
             target_email = self.request.data.get('target_email')
+            if not target_email:
+                raise ValidationError({'target_email': 'Укажите email пользователя'})
             try:
                 target_user = User.objects.get(email=target_email)
-                serializer.save(user=target_user, sender='admin')
             except User.DoesNotExist:
-                serializer.save(user=self.request.user, sender='admin')
+                raise ValidationError({'target_email': 'Пользователь не найден'})
+            serializer.save(user=target_user, sender='admin')
         else:
             serializer.save(user=self.request.user, sender='user')
+
+
+class NewsViewSet(viewsets.ModelViewSet):
+    """Новости: публика читает, админ управляет."""
+    serializer_class = NewsSerializer
+
+    def get_permissions(self):
+        if self.action in ('list', 'retrieve'):
+            return [permissions.AllowAny()]
+        return [permissions.IsAdminUser()]
+
+    def get_queryset(self):
+        qs = News.objects.all()
+        if not (self.request.user.is_authenticated and self.request.user.is_staff):
+            qs = qs.filter(is_published=True)
+        return qs.order_by('-sort_order', '-created_at')

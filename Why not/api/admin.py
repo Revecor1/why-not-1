@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, MenuItem, Order, OrderItem, Reservation, ChatMessage
+from .models import Category, MenuItem, Order, OrderItem, Reservation, ChatMessage, News
 
 
 @admin.register(Category)
@@ -35,6 +35,14 @@ class ReservationAdmin(admin.ModelAdmin):
     list_display = ['name', 'date', 'time', 'guests', 'phone', 'user']
     list_filter = ['date']
     search_fields = ['name', 'phone']
+
+
+@admin.register(News)
+class NewsAdmin(admin.ModelAdmin):
+    list_display = ['title', 'badge', 'period', 'is_published', 'sort_order', 'created_at']
+    list_filter = ['is_published', 'badge_style']
+    list_editable = ['is_published', 'sort_order']
+    search_fields = ['title', 'body']
 
 
 @admin.register(ChatMessage)

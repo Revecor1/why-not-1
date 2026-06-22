@@ -4,14 +4,22 @@
  * Автоматически получает CSRF-токен и прикрепляет его к каждому запросу.
  */
 
-const API_BASE = 'http://127.0.0.1:8000/api';
+function resolveApiBase() {
+    const { protocol, hostname, port, origin } = window.location;
+    // Фронт и API на одном сервере Django (:8000)
+    if (port === '8000' || port === '') {
+        return `${origin}/api`;
+    }
+    // Отдельный статический сервер (3000, 5500 и т.д.)
+    const host = hostname || '127.0.0.1';
+    return `${protocol}//${host}:8000/api`;
+}
+
+const API_BASE = resolveApiBase();
 
 const api = {
     _csrfToken: null,
 
-    /**
-     * Инициализация: получаем CSRF-токен с сервера при загрузке страницы.
-     */
     async init() {
         try {
             const data = await this._rawFetch('/csrf/', { method: 'GET' });
@@ -21,9 +29,6 @@ const api = {
         }
     },
 
-    /**
-     * Базовый fetch с автоматическим CSRF и credentials.
-     */
     async _rawFetch(endpoint, options = {}) {
         const response = await fetch(`${API_BASE}${endpoint}`, {
             credentials: 'include',
@@ -37,19 +42,48 @@ const api = {
 
         if (!response.ok) {
             const err = await response.json().catch(() => ({}));
-            throw new Error(err.error || err.detail || `Ошибка ${response.status}`);
+            let message;
+            if (err.error) message = err.error;
+            else if (typeof err.detail === 'string') message = err.detail;
+            else {
+                const fieldMsg = Object.entries(err)
+                    .filter(([key]) => key !== 'detail')
+                    .map(([key, val]) => `${key}: ${Array.isArray(val) ? val.join(', ') : val}`)
+                    .join('; ');
+                message = fieldMsg || `Ошибка ${response.status}`;
+            }
+            const error = new Error(message);
+            error.status = response.status;
+            throw error;
         }
 
-        // Для 204 No Content нет тела
         if (response.status === 204) return null;
         return response.json();
     },
 
-    fetch(endpoint, options = {}) {
-        return this._rawFetch(endpoint, options);
+    async fetch(endpoint, options = {}) {
+        await this.ready;
+        try {
+            return await this._rawFetch(endpoint, options);
+        } catch (e) {
+            const isMutation = options.method && options.method !== 'GET';
+            if (e.status === 403 && isMutation) {
+                await this.init();
+                return this._rawFetch(endpoint, options);
+            }
+            throw e;
+        }
     },
 
-    // ---- Auth ----
+    isAuthError(err) {
+        return err?.status === 401 || err?.status === 403 ||
+            (err?.message && (
+                err.message.includes('Not authenticated') ||
+                err.message.includes('Ошибка 401') ||
+                err.message.includes('Ошибка 403')
+            ));
+    },
+
     login(username, password) {
         return this.fetch('/auth/login/', {
             method: 'POST',
@@ -69,12 +103,10 @@ const api = {
         return this.fetch('/auth/me/');
     },
 
-    // ---- Menu ----
     getMenu() {
         return this.fetch('/menu/');
     },
 
-    // ---- Orders ----
     getOrders() {
         return this.fetch('/orders/');
     },
@@ -88,7 +120,6 @@ const api = {
         return this.fetch(`/orders/${id}/complete/`, { method: 'POST' });
     },
 
-    // ---- Reservations ----
     getReservations() {
         return this.fetch('/reservations/');
     },
@@ -102,7 +133,6 @@ const api = {
         return this.fetch(`/reservations/${id}/`, { method: 'DELETE' });
     },
 
-    // ---- Chat ----
     getMyChat() {
         return this.fetch('/chats/');
     },
@@ -122,7 +152,25 @@ const api = {
             body: JSON.stringify({ text, target_email: targetEmail }),
         });
     },
+
+    getNews() {
+        return this.fetch('/news/');
+    },
+    createNews(data) {
+        return this.fetch('/news/', {
+            method: 'POST',
+            body: JSON.stringify(data),
+        });
+    },
+    updateNews(id, data) {
+        return this.fetch(`/news/${id}/`, {
+            method: 'PATCH',
+            body: JSON.stringify(data),
+        });
+    },
+    deleteNews(id) {
+        return this.fetch(`/news/${id}/`, { method: 'DELETE' });
+    },
 };
 
-// Инициализируем API сразу при загрузке страницы
-api.init();
+api.ready = api.init();

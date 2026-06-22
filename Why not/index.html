@@ -97,7 +97,7 @@
             <img src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=500&q=80" class="w-full h-80 object-cover grayscale-[0.5] hover:grayscale-0 transition-all duration-700" alt="Coffee">
             <img src="https://images.unsplash.com/photo-1559925393-8be0ec4767c8?w=500&q=80" class="w-full h-80 object-cover grayscale-[0.5] hover:grayscale-0 transition-all duration-700" alt="Interior">
             <img src="https://images.unsplash.com/photo-1497935586351-b67a49e012bf?w=500&q=80" class="w-full h-80 object-cover grayscale-[0.5] hover:grayscale-0 transition-all duration-700" alt="Coffee art">
-            <img src="https://images.unsplash.com/photo-1521017430531-1379c65b1613?w=500&q=80" class="w-full h-80 object-cover grayscale-[0.5] hover:grayscale-0 transition-all duration-700" alt="Food">
+            <img src="https://images.unsplash.com/photo-1612874742237-6526221588e3?w=500&q=80" class="w-full h-80 object-cover grayscale-[0.5] hover:grayscale-0 transition-all duration-700" alt="Food">
         </div>
     </section>
 
@@ -114,7 +114,7 @@
                         <i class="fas fa-map-marked-alt text-2xl text-terracotta"></i>
                         <div>
                             <h4 class="text-lg font-bold text-coffee-900">Где мы?</h4>
-                            <p class="text-coffee-600">Ульяновск, ул. Карла Маркса, 18, 1 этаж</p>
+                            <a href="https://yandex.ru/maps/195/ulyanovsk/house/ulitsa_karla_marksa_18/YEEYdQ5iSkcCQFtufX9zcX9hZQ==/" target="_blank" rel="noopener noreferrer" class="text-coffee-600 hover:text-terracotta transition-colors">Ульяновск, ул. Карла Маркса, 18, 1 этаж</a>
                         </div>
                     </div>
                     <div class="flex items-start gap-6">
@@ -126,17 +126,18 @@
                     </div>
                 </div>
             </div>
-            <div class="h-[450px] rounded-[3rem] overflow-hidden border-[12px] border-coffee-50">
-                <iframe src="https://yandex.ru/map-widget/v1/?um=constructor%3A3b035a1a1f0a28f8045f2e16f8ec26f5f6d6346b9a89c9339ea89254c25f46eb&amp;source=constructor" width="100%" height="100%" frameborder="0"></iframe>
-            </div>
+            <div id="map-placeholder" data-height="h-[450px]"></div>
         </div>
     </section>
 
+    <div id="cart-placeholder"></div>
+    <div id="toast-container" class="fixed bottom-6 right-6 flex flex-col gap-3 z-[10000]"></div>
     <div id="footer-placeholder"></div>
     <div id="chat-placeholder"></div>
 
     <script src="js/api.js"></script>
     <script src="js/components.js"></script>
+    <script src="js/app.js"></script>
     <script src="js/chat.js"></script>
 </body>
 </html>

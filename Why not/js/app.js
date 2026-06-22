@@ -5,19 +5,46 @@
  */
 
 document.addEventListener('DOMContentLoaded', async () => {
+    const MAX_ITEM_QUANTITY = 10;
+
     // ---- State ----
     let cart = JSON.parse(localStorage.getItem('coffee_cart')) || [];
     let currentUser = JSON.parse(localStorage.getItem('coffee_user')) || null;
 
+    await api.ready;
+    try {
+        const freshUser = await api.getCurrentUser();
+        localStorage.setItem('coffee_user', JSON.stringify(freshUser));
+        currentUser = freshUser;
+    } catch {
+        localStorage.removeItem('coffee_user');
+        currentUser = null;
+    }
+
     const path = window.location.pathname;
+
+    function isMenuPage() {
+        return /\/menu(\.html)?$/i.test(path) || path.includes('menu.html');
+    }
+
+    function isProfilePage() {
+        return /\/profile(\.html)?$/i.test(path) || path.includes('profile.html');
+    }
+
+    // Сбрасываем старые корзины, где было больше лимита
+    let cartClamped = false;
+    cart.forEach(item => {
+        if (item.quantity > MAX_ITEM_QUANTITY) {
+            item.quantity = MAX_ITEM_QUANTITY;
+            cartClamped = true;
+        }
+    });
+    if (cartClamped) localStorage.setItem('coffee_cart', JSON.stringify(cart));
 
     // ---- Глобальная инициализация ----
     updateCartCount();
     setupCartEvents();
 
-    // Определяем, какую страницу инициализировать
-    if (path.includes('menu.html'))   await initMenuPage();
-    if (path.includes('profile.html')) await initProfilePage();
     // auth.html имеет собственный встроенный скрипт
 
     // ---- КОРЗИНА ----
@@ -60,9 +87,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function addToCart(item) {
         const existing = cart.find(i => i.id === item.id);
-        if (existing) existing.quantity++;
-        else cart.push({ ...item, quantity: 1 });
+        if (existing) {
+            if (existing.quantity >= MAX_ITEM_QUANTITY) {
+                showToast(`Максимум ${MAX_ITEM_QUANTITY} шт. «${item.name}» в одном заказе`, 'error');
+                return false;
+            }
+            existing.quantity++;
+        } else {
+            cart.push({ ...item, quantity: 1 });
+        }
         saveCart();
+        return true;
     }
 
     function renderCartItems() {
@@ -103,8 +138,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <button class="qty-btn w-8 h-8 bg-white rounded-xl shadow-sm border border-coffee-100 flex items-center justify-center text-coffee-700 hover:border-terracotta hover:text-terracotta font-bold transition-all"
                             data-idx="${index}" data-delta="-1">−</button>
                     <span class="w-6 text-center font-bold text-sm">${item.quantity}</span>
-                    <button class="qty-btn w-8 h-8 bg-white rounded-xl shadow-sm border border-coffee-100 flex items-center justify-center text-coffee-700 hover:border-terracotta hover:text-terracotta font-bold transition-all"
-                            data-idx="${index}" data-delta="1">+</button>
+                    <button class="qty-btn w-8 h-8 bg-white rounded-xl shadow-sm border border-coffee-100 flex items-center justify-center text-coffee-700 hover:border-terracotta hover:text-terracotta font-bold transition-all disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:border-coffee-100 disabled:hover:text-coffee-700"
+                            data-idx="${index}" data-delta="1" ${item.quantity >= MAX_ITEM_QUANTITY ? 'disabled' : ''}>+</button>
                 </div>
             `;
             container.appendChild(div);
@@ -116,6 +151,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             btn.addEventListener('click', () => {
                 const idx   = parseInt(btn.dataset.idx);
                 const delta = parseInt(btn.dataset.delta);
+                if (delta > 0 && cart[idx].quantity >= MAX_ITEM_QUANTITY) {
+                    showToast(`Максимум ${MAX_ITEM_QUANTITY} шт. «${cart[idx].name}» в одном заказе`, 'error');
+                    return;
+                }
                 cart[idx].quantity += delta;
                 if (cart[idx].quantity <= 0) cart.splice(idx, 1);
                 saveCart();
@@ -127,6 +166,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function handleCheckout() {
         if (cart.length === 0) { showToast('Добавьте что-нибудь в корзину', 'error'); return; }
         if (!currentUser)      { toggleCart(false); window.location.href = 'auth.html'; return; }
+
+        const overLimit = cart.find(item => item.quantity > MAX_ITEM_QUANTITY);
+        if (overLimit) {
+            showToast(`Максимум ${MAX_ITEM_QUANTITY} шт. «${overLimit.name}» в одном заказе`, 'error');
+            return;
+        }
 
         const btn = document.getElementById('checkout-btn');
         btn.disabled = true;
@@ -178,14 +223,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         });
 
-        // Дата для бронирования
-        const dateInput = document.getElementById('res-date');
-        if (dateInput) {
-            dateInput.min = new Date().toISOString().split('T')[0];
-            dateInput.value = new Date().toISOString().split('T')[0];
-        }
-
-        document.getElementById('reservation-form')?.addEventListener('submit', handleReservation);
     }
 
     function showMenuSkeleton() {
@@ -260,9 +297,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const id   = parseInt(btn.dataset.id);
                 const item = menuData.find(i => i.id === id);
                 if (!item) return;
-                addToCart(item);
+                if (!addToCart(item)) return;
 
-                // Визуальная обратная связь
                 btn.innerHTML = '<i class="fas fa-check"></i> Добавлено';
                 btn.classList.add('bg-green-500', 'text-white', 'border-green-500');
                 btn.classList.remove('bg-coffee-50', 'text-coffee-800');
@@ -279,6 +315,96 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // ---- БРОНИРОВАНИЕ ----
 
+    const RES_OPEN = '07:00';
+    const RES_CLOSE = '22:00';
+    const MAX_RES_GUESTS = 6;
+    const PHONE_RE = /^(?:\+7|8)\d{10}$/;
+
+    function getTodayStr() {
+        const d = new Date();
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
+    }
+
+    function getCurrentTimeStr() {
+        const now = new Date();
+        let h = now.getHours();
+        let m = now.getMinutes();
+        const remainder = m % 15;
+        if (remainder !== 0) m += 15 - remainder;
+        if (m >= 60) {
+            m -= 60;
+            h += 1;
+        }
+        return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+    }
+
+    function normalizePhone(phone) {
+        return phone.replace(/[\s\-()]/g, '');
+    }
+
+    function isValidPhone(phone) {
+        return PHONE_RE.test(normalizePhone(phone));
+    }
+
+    function isReservationInFuture(dateStr, timeStr) {
+        return new Date(`${dateStr}T${timeStr}`) > new Date();
+    }
+
+    function setupReservationForm() {
+        const form = document.getElementById('reservation-form');
+        const dateInput = document.getElementById('res-date');
+        const timeInput = document.getElementById('res-time');
+        const guestsInput = document.getElementById('res-guests');
+        const phoneInput = document.getElementById('res-phone');
+        if (!dateInput || !timeInput) return;
+
+        dateInput.min = getTodayStr();
+        if (!dateInput.value || dateInput.value < dateInput.min) {
+            dateInput.value = dateInput.min;
+        }
+        timeInput.min = RES_OPEN;
+        timeInput.max = RES_CLOSE;
+
+        function updateTimeConstraints() {
+            const today = getTodayStr();
+            if (dateInput.value === today) {
+                const nowTime = getCurrentTimeStr();
+                timeInput.min = nowTime > RES_OPEN ? nowTime : RES_OPEN;
+                if (timeInput.min > RES_CLOSE) {
+                    timeInput.min = RES_CLOSE;
+                }
+            } else {
+                timeInput.min = RES_OPEN;
+            }
+            if (timeInput.value && timeInput.value < timeInput.min) {
+                timeInput.value = '';
+            }
+        }
+
+        if (!form.dataset.reservationBound) {
+            form.dataset.reservationBound = '1';
+            dateInput.addEventListener('change', updateTimeConstraints);
+            guestsInput?.addEventListener('input', () => {
+                const n = parseInt(guestsInput.value, 10);
+                if (n > MAX_RES_GUESTS) guestsInput.value = MAX_RES_GUESTS;
+                if (n < 1 && guestsInput.value !== '') guestsInput.value = 1;
+            });
+            phoneInput?.addEventListener('blur', () => {
+                const cleaned = normalizePhone(phoneInput.value);
+                if (cleaned && isValidPhone(cleaned)) {
+                    phoneInput.value = cleaned.startsWith('8')
+                        ? '+7' + cleaned.slice(1)
+                        : cleaned;
+                }
+            });
+        }
+
+        updateTimeConstraints();
+    }
+
     async function handleReservation(e) {
         e.preventDefault();
         if (!currentUser) {
@@ -287,22 +413,51 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        const btn = e.target.querySelector('button[type="submit"]');
+        const dateStr = document.getElementById('res-date').value;
+        const timeStr = document.getElementById('res-time').value;
+        const guests  = parseInt(document.getElementById('res-guests').value, 10);
+        const name    = document.getElementById('res-name').value.trim();
+        const phone   = document.getElementById('res-phone').value.trim();
+
+        if (!timeStr) {
+            showToast('Выберите время бронирования', 'error');
+            return;
+        }
+        if (guests < 1 || guests > MAX_RES_GUESTS) {
+            showToast(`Гостей должно быть от 1 до ${MAX_RES_GUESTS}`, 'error');
+            return;
+        }
+        if (!isValidPhone(phone)) {
+            showToast('Телефон: +7 или 8, затем 10 цифр', 'error');
+            return;
+        }
+        if (!isReservationInFuture(dateStr, timeStr)) {
+            showToast('Нельзя забронировать столик на прошедшее время', 'error');
+            return;
+        }
+        if (timeStr < RES_OPEN || timeStr > RES_CLOSE) {
+            showToast('Бронь доступна с 07:00 до 22:00', 'error');
+            return;
+        }
+
+        const form = e.currentTarget;
+        const btn = form.querySelector('button[type="submit"]');
+        if (!btn) return;
         btn.disabled = true;
         btn.textContent = 'Бронируем...';
 
         try {
             await api.createReservation({
-                date:    document.getElementById('res-date').value,
-                time:    document.getElementById('res-time').value,
-                guests:  e.target[2].value,
-                name:    e.target[3].value,
-                phone:   e.target[4].value,
-                comment: e.target[5]?.value || '',
+                date: dateStr,
+                time: timeStr,
+                guests,
+                name,
+                phone: normalizePhone(phone),
+                comment: document.getElementById('res-comment')?.value.trim() || '',
             });
             showToast('✅ Столик забронирован! До встречи.');
-            e.target.reset();
-            document.getElementById('res-date').value = new Date().toISOString().split('T')[0];
+            form.reset();
+            setupReservationForm();
         } catch (err) {
             showToast('Ошибка: ' + err.message, 'error');
         } finally {
@@ -408,5 +563,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             div.style.transform = 'translateX(20px)';
             setTimeout(() => div.remove(), 300);
         }, 3000);
+    }
+
+    // Инициализация страниц (после объявления всех функций)
+    if (isMenuPage()) {
+        setupReservationForm();
+        const resForm = document.getElementById('reservation-form');
+        if (resForm && !resForm.dataset.submitBound) {
+            resForm.dataset.submitBound = '1';
+            resForm.addEventListener('submit', handleReservation);
+        }
+        await initMenuPage();
+    }
+    if (isProfilePage()) {
+        await initProfilePage();
     }
 });

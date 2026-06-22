@@ -56,6 +56,9 @@
                     <button class="admin-nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl text-white/60 hover:bg-white/5 transition-all" data-target="reservations">
                         <i class="fas fa-calendar-check w-5"></i> Брони
                     </button>
+                    <button class="admin-nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl text-white/60 hover:bg-white/5 transition-all" data-target="news">
+                        <i class="fas fa-newspaper w-5"></i> Новости
+                    </button>
                     <button class="admin-nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl text-white/60 hover:bg-white/5 transition-all" data-target="chats">
                         <i class="fas fa-comments w-5"></i> Чаты
                         <span id="admin-chat-badge" class="ml-auto bg-terracotta text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full hidden">0</span>
@@ -97,6 +100,82 @@
                     </div>
                 </div>
 
+                <div id="admin-content-news" class="admin-section hidden space-y-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+                        <h2 class="text-3xl font-serif font-bold">Новости и акции</h2>
+                        <button id="admin-news-add-btn" class="bg-terracotta hover:bg-terracotta-600 text-white font-bold px-6 py-3 rounded-xl transition-all text-sm">
+                            <i class="fas fa-plus mr-2"></i> Добавить новость
+                        </button>
+                    </div>
+
+                    <div id="admin-news-form-wrap" class="hidden bg-white rounded-3xl shadow-sm border border-gray-200 p-8">
+                        <h3 id="admin-news-form-title" class="text-xl font-bold mb-6">Новая новость</h3>
+                        <form id="admin-news-form" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <input type="hidden" id="news-edit-id">
+                            <div class="md:col-span-2">
+                                <label class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 block">Заголовок</label>
+                                <input type="text" id="news-title" required class="w-full bg-gray-100 border-none rounded-xl p-4 outline-none focus:ring-2 focus:ring-coffee-800">
+                            </div>
+                            <div>
+                                <label class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 block">Период</label>
+                                <input type="text" id="news-period" required placeholder="Каждую пятницу" class="w-full bg-gray-100 border-none rounded-xl p-4 outline-none focus:ring-2 focus:ring-coffee-800">
+                            </div>
+                            <div>
+                                <label class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 block">Бейдж</label>
+                                <input type="text" id="news-badge" value="Акция" class="w-full bg-gray-100 border-none rounded-xl p-4 outline-none focus:ring-2 focus:ring-coffee-800">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 block">Текст</label>
+                                <textarea id="news-body" required rows="4" class="w-full bg-gray-100 border-none rounded-xl p-4 outline-none focus:ring-2 focus:ring-coffee-800 resize-none"></textarea>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 block">URL изображения</label>
+                                <input type="url" id="news-image" required placeholder="https://images.unsplash.com/..." class="w-full bg-gray-100 border-none rounded-xl p-4 outline-none focus:ring-2 focus:ring-coffee-800">
+                            </div>
+                            <div>
+                                <label class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 block">Стиль бейджа</label>
+                                <select id="news-badge-style" class="w-full bg-gray-100 border-none rounded-xl p-4 outline-none focus:ring-2 focus:ring-coffee-800">
+                                    <option value="terracotta">Оранжевый</option>
+                                    <option value="dark">Тёмный</option>
+                                    <option value="green">Зелёный</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 block">Порядок сортировки</label>
+                                <input type="number" id="news-sort-order" value="0" min="0" class="w-full bg-gray-100 border-none rounded-xl p-4 outline-none focus:ring-2 focus:ring-coffee-800">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 block">Теги (иконка | текст, по одному на строку)</label>
+                                <textarea id="news-tags" rows="3" placeholder="fas fa-clock | 07:00 – 22:00" class="w-full bg-gray-100 border-none rounded-xl p-4 outline-none focus:ring-2 focus:ring-coffee-800 resize-none font-mono text-sm"></textarea>
+                            </div>
+                            <div>
+                                <label class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 block">Примечание внизу</label>
+                                <input type="text" id="news-footer-note" placeholder="Действует каждую пятницу" class="w-full bg-gray-100 border-none rounded-xl p-4 outline-none focus:ring-2 focus:ring-coffee-800">
+                            </div>
+                            <div>
+                                <label class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 block">Ссылка (URL)</label>
+                                <input type="text" id="news-link-url" placeholder="menu.html" class="w-full bg-gray-100 border-none rounded-xl p-4 outline-none focus:ring-2 focus:ring-coffee-800">
+                            </div>
+                            <div>
+                                <label class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 block">Текст кнопки</label>
+                                <input type="text" id="news-link-text" placeholder="Перейти в меню" class="w-full bg-gray-100 border-none rounded-xl p-4 outline-none focus:ring-2 focus:ring-coffee-800">
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <input type="checkbox" id="news-is-published" checked class="w-5 h-5 rounded accent-coffee-800">
+                                <label for="news-is-published" class="text-sm font-bold text-gray-700">Опубликовано</label>
+                            </div>
+                            <div class="md:col-span-2 flex gap-3 pt-2">
+                                <button type="submit" class="bg-coffee-900 text-white font-bold px-8 py-3 rounded-xl hover:bg-coffee-800 transition-all">Сохранить</button>
+                                <button type="button" id="admin-news-cancel-btn" class="bg-gray-200 text-gray-700 font-bold px-8 py-3 rounded-xl hover:bg-gray-300 transition-all">Отмена</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div id="admin-news-list" class="space-y-4">
+                        <!-- JS -->
+                    </div>
+                </div>
+
                 <div id="admin-content-chats" class="admin-section hidden space-y-6 h-full">
                     <h2 class="text-3xl font-serif font-bold mb-8">Поддержка (Чаты)</h2>
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[600px]">
@@ -127,6 +206,7 @@
 
     <div id="toast-container" class="fixed bottom-6 right-6 flex flex-col gap-3 z-[10000]"></div>
 
+    <script src="js/api.js"></script>
     <script src="js/admin.js"></script>
 </body>
 </html>
